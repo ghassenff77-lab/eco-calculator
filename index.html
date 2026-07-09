@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة البصمة البيئية الذكية | Ecological Footprint Calculator</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --primary-light: #e8f5e9;
+            --text-dark: #2c3e50;
+            --bg-light: #f8f9fa;
+            --white: #ffffff;
+            --low-impact: #4caf50;
+            --med-impact: #ff9800;
+            --high-impact: #f44336;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Tajawal', 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* Navigation Bar */
+        nav {
+            background-color: var(--white);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .lang-switcher select {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-family: inherit;
+            cursor: pointer;
+            background: var(--white);
+        }
+
+        /* Container & Layout */
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        header h1 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 2.2rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border-top: 4px solid var(--primary);
+        }
+
+        .card h3 {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary);
+        }
+
+        /* Button */
+        .btn-container {
+            text-align: center;
+            margin: 2.5rem 0;
+        }
+
+        .btn-calc {
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 1rem 3rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
+            font-family: inherit;
+        }
+
+        .btn-calc:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 125, 50, 0.4);
+        }
+
+        /* Results Dashboard */
+        .results-dashboard {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .results-title {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-dark);
+        }
+
+        .gauge-container {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 1.5rem auto;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gauge-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(var(--low-impact) 0%, #e0e0e0 0%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gauge-inner {
+            width: 80%;
+            height: 80%;
+            background: var(--white);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gauge-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .gauge-unit {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+        }
+
+        .breakdown {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #eee;
+        }
+
+        .breakdown-item {
+            text-align: center;
+        }
+
+        .breakdown-value {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .tips-box {
+            background-color: var(--primary-light);
+            border-right: 5px solid var(--primary);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #2c3e50;
+            color: var(--white);
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 4rem;
+            font-size: 1rem;
+            border-top: 4px solid var(--primary);
+        }
+
+        /* LTR Styles for English/French */
+        body.ltr {
+            direction: ltr;
+        }
+        body.ltr .tips-box {
+            border-right: none;
+            border-left: 5px solid var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">🌱 <span id="nav-title">حاسبة البصمة البيئية</span></div>
+        <div class="lang-switcher">
+            <select id="langSelect" onchange="changeLanguage()">
+                <option value="ar">العربية</option>
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+            </select>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1 id="main-title">احسب بصمتك الكربونية والبيئية</h1>
+            <p id="main-subtitle">اكتشف مدى تأثير استهلاكك اليومي على كوكب الأرض واحصل على نصائح ذكية مخصصة لك.</p>
+        </header>
+
+        <div class="grid">
+            <!-- Electricity Card -->
+            <div class="card">
+                <h3>⚡ <span id="lbl-elec-title">استهلاك الكهرباء</span></h3>
+                <div class="form-group">
+                    <label id="lbl-elec-input">الاستهلاك الشهري (كيلوواط ساعة/kWh):</label>
+                    <input type="number" id="input-elec" placeholder="0" min="0">
+                </div>
+            </div>
+
+            <!-- Transport Card -->
+            <div class="card">
+                <h3>🚗 <span id="lbl-trans-title">النقل والمواصلات</span></h3>
+                <div class="form-group">
+                    <label id="lbl-trans-input">المسافة المقطوعة أسبوعياً بالسيارة (كم):</label>
+                    <input type="number" id="input-trans" placeholder="0" min="0">
+                </div>
+            </div>
+
+            <!-- Water Card -->
+            <div class="card">
+                <h3>💧 <span id="lbl-water-title">استهلاك المياه</span></h3>
+                <div class="form-group">
+                    <label id="lbl-water-input">الاستهلاك اليومي للمياه (لتر):</label>
+                    <input type="number" id="input-water" placeholder="0" min="0">
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-container">
+            <button class="btn-calc" id="btn-calculate" onclick="calculateFootprint()">احسب بصمتي البيئية</button>
+        </div>
+
+        <!-- Results Dashboard -->
+        <div class="results-dashboard" id="resultsDashboard">
+            <h2 class="results-title" id="res-title">نتائج بصمتك البيئية الإجمالية</h2>
+            
+            <div class="gauge-container">
+                <div class="gauge-circle" id="gaugeCircle">
+                    <div class="gauge-inner">
+                        <span class="gauge-value" id="totalValue">0</span>
+                        <span class="gauge-unit" id="res-unit">كجم CO₂ / شهرياً</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="breakdown">
+                <div class="breakdown-item">
+                    <div id="break-elec">⚡ الكهرباء</div>
+                    <div class="breakdown-value" id="val-elec">0 كجم</div>
+                </div>
+                <div class="breakdown-item">
+                    <div id="break-trans">🚗 النقل</div>
+                    <div class="breakdown-value" id="val-trans">0 كجم</div>
+                </div>
+                <div class="breakdown-item">
+                    <div id="break-water">💧 المياه</div>
+                    <div class="breakdown-value" id="val-water">0 كجم</div>
+                </div>
+            </div>
+
+            <div class="tips-box">
+                <strong id="tips-heading">💡 نصيحة ذكية مخصصة لك:</strong>
+                <p id="tipsText"></p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div id="footer-text">تم إنشاء هذا الموقع من طرف المبرمج يوسف خالد</div>
+    </footer>
+
+    <script>
+        const translations = {
+            ar: {
+                navTitle: "حاسبة البصمة البيئية",
+                mainTitle: "احسب بصمتك الكربونية والبيئية",
+                mainSubtitle: "اكتشف مدى تأثير استهلاكك اليومي على كوكب الأرض واحصل على نصائح ذكية مخصصة لك.",
+                elecTitle: "استهلاك الكهرباء",
+                elecInput: "الاستهلاك الشهري (كيلوواط ساعة/kWh):",
+                transTitle: "النقل والمواصلات",
+                transInput: "المسافة المقطوعة أسبوعياً بالسيارة (كم):",
+                waterTitle: "استهلاك المياه",
+                waterInput: "الاستهلاك اليومي للمياه (لتر):",
+                btnCalc: "احسب بصمتي البيئية",
+                resTitle: "نتائج بصمتك البيئية الإجمالية",
+                resUnit: "كجم CO₂ / شهرياً",
+                breakElec: "⚡ الكهرباء",
+                breakTrans: "🚗 النقل",
+                breakWater: "💧 المياه",
+                tipsHeading: "💡 نصيحة ذكية مخصصة لك:",
+                footer: "تم إنشاء هذا الموقع من طرف المبرمج يوسف خالد",
+                tipLow: "ممتاز! بصمتك البيئية منخفضة جداً. واصل الحفاظ على كوكبنا الرائع ونشر الوعي بين أصدقائك.",
+                tipElec: "استهلاكك عالي في الكهرباء. حاول إطفاء الأجهزة غير المستخدمة والاعتماد على الإضاءة الطبيعية لتقليل الانبعاثات.",
+                tipTrans: "انبعاثات النقل لديك مرتفعة. جرب استخدام الدراجة الهوائية، المشي، أو مشاركة الركوب لتقليل البصمة الكربونية.",
+                tipWater: "استهلاكك للمياه مرتفع نسبياً. حاول تركيب أدوات ترشيد المياه وتجنب الهدر أثناء الاستخدام اليومي."
+            },
+            en: {
+                navTitle: "Eco Footprint Calculator",
+                mainTitle: "Calculate Your Carbon & Eco Footprint",
+                mainSubtitle: "Discover how your daily habits impact the planet and get smart, personalized eco-tips.",
+                elecTitle: "Electricity Consumption",
+                elecInput: "Monthly Consumption (kWh):",
+                transTitle: "Transport & Travel",
+                transInput: "Weekly Distance Driven (km):",
+                waterTitle: "Water Consumption",
+                waterInput: "Daily Water Usage (Liters):",
+                btnCalc: "Calculate My Footprint",
+                resTitle: "Your Total Ecological Footprint Results",
+                resUnit: "kg CO₂ / Month",
+                breakElec: "⚡ Electricity",
+                breakTrans: "🚗 Transport",
+                breakWater: "💧 Water",
+                tipsHeading: "💡 Smart Tip for You:",
+                footer: "This website was developed by Programmer Yousef Khaled",
+                tipLow: "Excellent! Your footprint is remarkably low. Keep up the amazing work sustaining our beautiful planet!",
+                tipElec: "Your electricity usage is high. Switch off unused appliances and embrace natural light to slash emissions.",
+                tipTrans: "Your transportation emissions are elevated. Consider walking, cycling, or carpooling to reduce impact.",
+                tipWater: "Your water footprint is slightly high. Fix leaks and practice mindful consumption during daily routines."
+            },
+            fr: {
+                navTitle: "Calculateur d'Empreinte Éco",
+                mainTitle: "Calculez Votre Empreinte Carbone et Écologique",
+                mainSubtitle: "Découvrez l'impact de vos choix quotidiens sur la planète et recevez des conseils éco intelligents.",
+                elecTitle: "Consommation d'Électricité",
+                elecInput: "Consommation Mensuelle (kWh):",
+                transTitle: "Transport & Déplacements",
+                transInput: "Distance Hebdomadaire en Voiture (km):",
+                waterTitle: "Consommation d'Eau",
+                waterInput: "Usage Quotidien d'Eau (Litres):",
+                btnCalc: "Calculer Mon Empreinte",
+                resTitle: "Résultats Globaux de Votre Empreinte Écologique",
+                resUnit: "kg CO₂ / Mois",
+                breakElec: "⚡ Électricité",
+                breakTrans: "🚗 Transport",
+                breakWater: "💧 Eau",
+                tipsHeading: "💡 Conseil Intelligent pour Vous:",
+                footer: "Ce site a été développé par le programmeur Yousef Khaled",
+                tipLow: "Excellent! Votre empreinte est très faible. Continuez à préserver notre belle planète!",
+                tipElec: "Votre consommation d'électricité est élevée. Éteignez les appareils inutilisés pour réduire les émissions.",
+                tipTrans: "Vos émissions de transport sont élevées. Pensez à marcher, faire du vélo ou faire du covoiturage.",
+                tipWater: "Votre empreinte eau est élevée. Réparez les fuites et adoptez une consommation éco-responsable."
+            }
+        };
+
+        function changeLanguage() {
+            const lang = document.getElementById('langSelect').value;
+            const body = document.body;
+
+            if (lang === 'ar') {
+                body.classList.remove('ltr');
+                body.setAttribute('dir', 'rtl');
+                body.setAttribute('lang', 'ar');
+            } else {
+                body.classList.add('ltr');
+                body.setAttribute('dir', 'ltr');
+                body.setAttribute('lang', lang);
+            }
+
+            // Apply translations
+            document.getElementById('nav-title').innerText = translations[lang].navTitle;
+            document.getElementById('main-title').innerText = translations[lang].mainTitle;
+            document.getElementById('main-subtitle').innerText = translations[lang].mainSubtitle;
+            document.getElementById('lbl-elec-title').innerText = translations[lang].elecTitle;
+            document.getElementById('lbl-elec-input').innerText = translations[lang].elecInput;
+            document.getElementById('lbl-trans-title').innerText = translations[lang].transTitle;
+            document.getElementById('lbl-trans-input').innerText = translations[lang].transInput;
+            document.getElementById('lbl-water-title').innerText = translations[lang].waterTitle;
+            document.getElementById('lbl-water-input').innerText = translations[lang].waterInput;
+            document.getElementById('btn-calculate').innerText = translations[lang].btnCalc;
+            document.getElementById('res-title').innerText = translations[lang].resTitle;
+            document.getElementById('res-unit').innerText = translations[lang].resUnit;
+            document.getElementById('break-elec').innerText = translations[lang].breakElec;
+            document.getElementById('break-trans').innerText = translations[lang].breakTrans;
+            document.getElementById('break-water').innerText = translations[lang].breakWater;
+            document.getElementById('tips-heading').innerText = translations[lang].tipsHeading;
+            document.getElementById('footer-text').innerText = translations[lang].footer;
+
+            // Recalculate if dashboard is open to update tip language
+            if (document.getElementById('resultsDashboard').style.display === 'block') {
+                calculateFootprint();
+            }
+        }
+
+        function calculateFootprint() {
+            const elec = parseFloat(document.getElementById('input-elec').value) || 0;
+            const trans = parseFloat(document.getElementById('input-trans').value) || 0;
+            const water = parseFloat(document.getElementById('input-water').value) || 0;
+            const lang = document.getElementById('langSelect').value;
+
+            // Equations (with standard math metrics scaled per month)
+            const elecResult = elec * 0.5;
+            const transResult = (trans * 0.2) * 4.33; // 4.33 weeks in a month
+            const waterResult = (water * 0.3) * 30;   // 30 days in a month
+
+            const totalScore = Math.round(elecResult + transResult + waterResult);
+
+            // Display Values
+            document.getElementById('totalValue').innerText = totalScore;
+            document.getElementById('val-elec').innerText = `${Math.round(elecResult)} ${lang === 'ar' ? 'كجم' : 'kg'}`;
+            document.getElementById('val-trans').innerText = `${Math.round(transResult)} ${lang === 'ar' ? 'كجم' : 'kg'}`;
+            document.getElementById('val-water').innerText = `${Math.round(waterResult)} ${lang === 'ar' ? 'كجم' : 'kg'}`;
+
+            // Smart Dynamic Tips & Gauge Color
+            let tip = translations[lang].tipLow;
+            let gaugeColor = '#4caf50'; // Green
+
+            if (totalScore > 150 && totalScore <= 400) {
+                gaugeColor = '#ff9800'; // Orange
+            } else if (totalScore > 400) {
+                gaugeColor = '#f44336'; // Red
+            }
+
+            // Decide tip based on the highest source of emission
+            if (totalScore > 100) {
+                if (elecResult >= transResult && elecResult >= waterResult) {
+                    tip = translations[lang].tipElec;
+                } else if (transResult >= elecResult && transResult >= waterResult) {
+                    tip = translations[lang].tipTrans;
+                } else {
+                    tip = translations[lang].tipWater;
+                }
+            }
+
+            // Update UI elements
+            document.getElementById('tipsText').innerText = tip;
+            
+            // Calculate percentage for gauge gradient visualization (Max estimated standard 800)
+            const percentage = Math.min((totalScore / 800) * 100, 100);
+            document.getElementById('gaugeCircle').style.background = `conic-gradient(${gaugeColor} ${percentage}%, #e0e0e0 ${percentage}%)`;
+
+            // Reveal dashboard with a smooth effect
+            const dashboard = document.getElementById('
